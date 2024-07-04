@@ -27,7 +27,7 @@ class RDSDatabaseConnector:  # Will contain methods used to extract data from th
         
         
        
-def load_credentials():                                                 # Load credentials from YAML file anf returns as dictionary
+def load_credentials():                                                 # Load credentials from YAML file and returns as dictionary
         credentials = yaml.safe_load(open('credentials.yaml', 'r'))
         return credentials
     
