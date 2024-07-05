@@ -20,6 +20,9 @@ class DataTransform:
         """Extracts first numbers in the string and converts to int64 data type which can handle NaN"""                          
         self.df[column_name] = self.df[column_name].str.extract(r'(\d+)').astype(float).astype('Int64')   
     
+    def convert_obj_to_int(self, column_name):
+        self.df[column_name] = pd.to_numeric(self.df[column_name]).astype(int)
+    
     def return_dataframe(self): 
         """Returns the dataframe"""                                                      
         return self.df
@@ -64,6 +67,10 @@ class DataFrameTransform:
          drop_df = self.df.drop(column_name, axis=1, inplace=True) # Drops named column
          return drop_df
      
+     def delete_row_using_id(self, id_no):
+        self.df.drop(self.df[self.df['id'] == id_no].index, inplace=True)
+        return self.df
+     
      def delete_row(self, column_name):
          drop_df = self.df.dropna(subset=[column_name], inplace=True) # Drops rows with null values in named column
          return drop_df
@@ -101,15 +108,26 @@ class DataFrameTransform:
      def impute_term(self, value_column, loan_amount, int_rate, instalment):
            # Calculate loan term in months using the formula
         import math
-        loan_amount = pd.to_numeric(loan_amount, errors='coerce')
-        int_rate = pd.to_numeric(int_rate, errors='coerce') / 100  # Convert annual interest rate to decimal
-        instalment = pd.to_numeric(instalment, errors='coerce')
-
-        loan_term_months = round(-(math.log(1 - ((loan_amount * ((int_rate) / 12)) / instalment))) / (math.log(1 + ((int_rate) / 12))))
-        self[value_column].fillna(int(loan_term_months), inplace=True)
-        return self[value_column]
+        self.df[loan_amount] = pd.to_numeric(self.df[loan_amount])
+        self.df[int_rate] = pd.to_numeric(self.df[int_rate]) / 100  # Convert annual interest rate to decimal
+        self.df[instalment] = pd.to_numeric(self.df[instalment])
+        import numpy as np
+        def calc_loan_term_months(row):            
+            if str(row[value_column]) == "<NA>":
+                try:
+                    row[value_column] = round(-(math.log(1 - ((row[loan_amount] * ((row[int_rate]) / 12)) / row[instalment]))) / (math.log(1 + ((row[int_rate]) / 12))))
+                except Exception as e:
+                    print(row["id"])
+                    print(e)
+                    print(row[loan_amount])
+                    print(row[int_rate])
+                    print(row[instalment])
+                return row
+            else:
+                return row
+        self.df = self.df.apply(calc_loan_term_months, axis=1)
+        return self.df
      
-
      def return_dataframe(self): 
          """Returns the dataframe"""                                                      
          return self.df
