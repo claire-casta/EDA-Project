@@ -1,7 +1,33 @@
 # Exploratory Data Analysis Project - Customer Loans in Finance
 
+## Project Brief
+You currently work for a large financial institution, where managing loans is a critical component of business operations.
+
+To ensure informed decisions are made about loan approvals and risk is efficiently managed, your task is to gain a comprehensive understanding of the loan portfolio data.
+
+Your task is to perform exploratory data analysis on the loan portfolio, using various statistical and data visualisation techniques to uncover patterns, relationships, and anomalies in the loan data.
+
+This information will enable the business to make more informed decisions about loan approvals, pricing, and risk management.
+
+By conducting exploratory data analysis on the loan data, you aim to gain a deeper understanding of the risk and return associated with the business' loans.
+
+Ultimately, your goal is to improve the performance and profitability of the loan portfolio.
+
 ## Project Description
-A description of the project: what it does, the aim of the project, and what you learned
+A description of the project: what it does, the aim of the project, and what you learned.
+
+This project takes a financial loan dataset in .csv file format and exploratory data analysis is performed to gain a deeper understanding of the dataset.
+
+The exploratory data analysis has several steps built into the project:
+1. Extract the data from the cloud.
+2. Initial data exploration to gain an overview of the dataframe.
+3. Convert column to the correct format
+4. Removing or imputing missing (null value) data
+5. Perform transformations on skewed data columns
+6. Identifying and removing outliers from the data
+7. Identifying and dropping overly correlated columns
+8. Analysis and visualisation to draw deeper insights
+
 
 ## Installation instructions
 

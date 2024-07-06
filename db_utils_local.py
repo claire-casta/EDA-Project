@@ -59,6 +59,57 @@ class DataframeInfo:
                 })
         return null_values
     
+    def analyze_skew(self):
+        """Returns the skewness of each column"""
+        numeric_columns = self.df.select_dtypes(include=['number']).columns
+        skewness = self.df[numeric_columns].skew()
+        return skewness
+    
+    def analyze_skew_methods(self, columns):
+        import pandas as pd
+        import numpy as np
+        from scipy.stats import boxcox, skew, yeojohnson
+        results = []
+
+        for column in columns:
+            original_data = self.df[column].dropna()
+            
+            # Calculate original skewness
+            original_skewness = skew(original_data)
+            
+            # Box-Cox transformation (only works with positive values)
+            if (original_data > 0).all():
+                boxcox_transformed, _ = boxcox(original_data)
+                boxcox_skewness = skew(boxcox_transformed)
+            else:
+                boxcox_skewness = np.nan
+            
+            # Log transformation (only works with positive values)
+            if (original_data > 0).all():
+                log_transformed = np.log1p(original_data)
+                log_skewness = skew(log_transformed)
+            else:
+                log_skewness = np.nan
+            
+            # Yeo-Johnson transformation (works with all values)
+            yeo_transformed, _ = yeojohnson(original_data)
+            yeo_skewness = skew(yeo_transformed)
+            
+            # Append results
+            results.append({
+                'Column': column,
+                'Original Skewness': original_skewness,
+                'Box-Cox Skewness': boxcox_skewness,
+                'Log Skewness': log_skewness,
+                'Yeo-Johnson Skewness': yeo_skewness
+            })
+    
+        return pd.DataFrame(results)
+
+    def correlation_columns(self):
+        return self.df.select_dtypes(include=['number']).corr()
+
+
 class DataFrameTransform:
      def __init__(self, df):
         self.df = df
@@ -100,7 +151,7 @@ class DataFrameTransform:
         for category in categories:
             # Filter the DataFrame for the current category
             mask = self.df[Category_Column] == category
-            # Forward fill missing values within the category
+            # Back fill missing values within the category
             self.df.loc[mask, Value_Column] = self.df.loc[mask, Value_Column].bfill()
         
         return self.df
@@ -128,10 +179,42 @@ class DataFrameTransform:
         self.df = self.df.apply(calc_loan_term_months, axis=1)
         return self.df
      
+     def apply_box_cox(self, column_name):
+         from scipy.stats import boxcox
+         transformed_data, _ = boxcox(self.df[column_name])
+         self.df[column_name] = transformed_data
+         return self.df[column_name]
+     
+     def apply_yeo_johnson(self, column_name):
+        from scipy.stats import yeojohnson
+        transformed_data, _ = yeojohnson(self.df[column_name])
+        self.df[column_name] = transformed_data
+        return self.df[column_name]
+     
      def return_dataframe(self): 
          """Returns the dataframe"""                                                      
          return self.df
-     
+    
+     def remove_outliers_IQR(self, column_name):
+        # Calculate Q1 (25th percentile) and Q3 (75th percentile)
+        Q1 = self.df[column_name].quantile(0.25)
+        Q3 = self.df[column_name].quantile(0.75)
+        
+        # Calculate the Interquartile Range (IQR)
+        IQR = Q3 - Q1
+        
+        # Define the bounds for outliers
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        
+        # Filter the DataFrame to remove outliers
+        filtered_df = self.df[(self.df[column_name] >= lower_bound) & (self.df[column_name] <= upper_bound)]
+        
+        # Update the DataFrame within the class
+        self.df = filtered_df
+
+
+
 class Plotter:
      def __init__(self, df):
         self.df = df
@@ -151,3 +234,80 @@ class Plotter:
          plt.ylabel('Values')
          plt.title('Discrete Probability Distribution')
          plt.show()
+
+     def histogram_df_columns(self):
+
+        import numpy as np
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        numeric_columns = self.df.select_dtypes(include=['number'])
+
+        # Adjusted plotting code
+        fig, axes = plt.subplots(5, 5, figsize=(15, 15))  
+        ax = axes.flatten()
+
+        for i, col in enumerate(numeric_columns.columns):
+            sns.histplot(self.df[col], ax=ax[i], kde=True, bins=20, color='blue', alpha=0.5)
+            ax[i].set_title(col)
+            ax[i].set_xlabel('Value')
+            ax[i].set_ylabel('Frequency')
+
+            # Set tick labels to plain style (non-scientific notation)
+            if pd.api.types.is_numeric_dtype(numeric_columns[col]):
+                ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+                ax[i].get_yaxis().get_major_formatter().set_scientific(False)
+
+        plt.tight_layout()
+        plt.show()
+
+     def qqplot_df_columns(self):
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from scipy import stats
+        import statsmodels.api as sm
+
+        numeric_columns = self.df.select_dtypes(include=['number'])
+
+        fig, axes = plt.subplots(5, 5, figsize=(15, 15))  # Adjusted for 5x5 grid
+        ax = axes.flatten()
+
+        for i, col in enumerate(numeric_columns.columns):
+            sm.qqplot(self.df[col], line='s', ax=ax[i])
+            ax[i].set_title(col)
+            ax[i].set_xlabel('Theoretical Quantiles')
+            ax[i].set_ylabel('Sample Quantiles')
+            ax[i].get_xaxis().get_major_formatter().set_scientific(False)
+            ax[i].get_yaxis().get_major_formatter().set_scientific(False)
+
+        plt.tight_layout()
+        plt.show()
+
+     def boxplot_with_scatter(self):
+        import numpy as np
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        numeric_columns = self.df.select_dtypes(include=['number'])
+
+        fig, axes = plt.subplots(9, 3, figsize=(40, 70))  
+        ax = axes.flatten()
+
+        for i, col in enumerate(numeric_columns.columns):
+            sns.boxplot(x=numeric_columns[col], ax=ax[i])
+            ax[i].set_title(col)
+            ax[i].set_ylabel('Value')
+
+        plt.tight_layout()
+        plt.show()
+
+     def heatmap(self, matrix):
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        plt.figure(figsize=(8, 6))
+        heatmap = sns.heatmap(matrix, annot=False, cmap='PRGn', center=0)
+        heatmap.set_title('Correlation Matrix Heatmap', fontdict={'fontsize':18}, pad=16)
+
+        # Display the heatmap
+        plt.show()
