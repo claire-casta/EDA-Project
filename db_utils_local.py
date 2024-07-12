@@ -243,7 +243,6 @@ class Plotter:
 
         numeric_columns = self.df.select_dtypes(include=['number'])
 
-        # Adjusted plotting code
         fig, axes = plt.subplots(5, 5, figsize=(15, 15))  
         ax = axes.flatten()
 
@@ -269,7 +268,7 @@ class Plotter:
 
         numeric_columns = self.df.select_dtypes(include=['number'])
 
-        fig, axes = plt.subplots(5, 5, figsize=(15, 15))  # Adjusted for 5x5 grid
+        fig, axes = plt.subplots(5, 5, figsize=(15, 15))  
         ax = axes.flatten()
 
         for i, col in enumerate(numeric_columns.columns):
