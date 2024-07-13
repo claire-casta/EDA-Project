@@ -1,4 +1,13 @@
-#List any non-conda packages here. Particularly anything installed with pip.
+#Installed packages
 
-#Conda installed packages
 #PyYAML
+#import missingno as msno
+#import psycopg2
+#from sqlalchemy import create_engine
+#import numpy as np
+#from scipy import stats
+#import statsmodels.api as sm
+#from scipy.stats import boxcox, skew, yeojohnson
+#import math
+#import seaborn as sns
+#import matplotlib.pyplot as plt

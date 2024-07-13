@@ -29,14 +29,31 @@ The exploratory data analysis has several steps built into the project:
 8. Analysis and visualisation to draw deeper insights
 
 
-## Installation instructions
+## Installation & Usage instructions
 
-## Usage instructions
+Download the repository to your local machine.
+The original downloaded dataframe is contained within the loan_payments.csv file, if you wish to inspect this.
+Open the following files in this order:
+1. loan_payments_queries.ipynb
+    - This document runs through the data preparation for the exploratory data analysis, explaining each step in turn and uses code that can be found in db_utils.py and db_utils_local.py. It also produces two copies of the dataframe; mod_loan_payments_pre_skew.csv and mod_loan_payments_post_skew_corr.csv, as well as a correlation_matrix.csv file.
+2. analysis_and_visualisations.ipynb
+    - This document runs through the analysis of the dataframe with visualisation throughout. It explains each step in the process and discusses the outcomes along the way. 
 
 ## File structure of the project
+EDA Project
+ - analysis_and_visualisations.ipynb (Notebook 2 for this EDA project detailing the analysis of dataframe)
+ - correlation matrix.csv (Output by loan_payments_queries.ipynb to allow a more detailed analysis of correlated columns)
+ - db_utils_local.py (Code referenced by loan_payments_queries.ipynb for use on the local machine)
+ - db_utils.py (Code referenced by loan_payments_queries.ipynb to extract data from the database and download it to a csv file on the local machine)
+ - loan_payments_queries.ipynb (Notebook 1 for this EDA project detailing the data preparation before analysis)
+ - loan_payments.csv (the original csv file downloaded from the database)
+ - mod_loan_payments_post_skew_corr.csv (Output by loan_payments_queries.ipynb to allow further analysis of the dataframe after correction for skew)
+ - mod_loan_payments_pre_skew.csv (Output by loan_payments_queries.ipynb to allow further analysis of the dataframe without the alterations to the data produced by skew corrections)
+ - README.md (information document to aid understanding of the contents of his repository)
+ - requirements.txt (contains a list of all the imports required for the code in this project to work)
 
 ## License information
-This game is licenced under the MIT Licence as outlined below.
+This work is licenced under the MIT Licence as outlined below.
 
 MIT License
 
