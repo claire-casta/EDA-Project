@@ -176,23 +176,22 @@ class DataFrameTransform:
          self.df[int_rate] = pd.to_numeric(self.df[int_rate]) / 100  # Convert annual interest rate to decimal
          self.df[instalment] = pd.to_numeric(self.df[instalment])
          import numpy as np
-    
-     #def calc_loan_term_months(row):            
-         #"""Failed code that did not work, but kept for now"""
-         #if str(row[value_column]) == "<NA>":
-             #try:
-                 #row[value_column] = round(-(math.log(1 - ((row[loan_amount] * ((row[int_rate]) / 12)) / row[instalment]))) / (math.log(1 + ((row[int_rate]) / 12))))
-             #except Exception as e:
-                # print(row["id"])
-                # print(e)
-                 #print(row[loan_amount])
-                # print(row[int_rate])
-                 #print(row[instalment])
-                 #return row
-             #else:
-                 #return row
-         #self.df = self.df.apply(calc_loan_term_months, axis=1)
-         #return self.df
+            # Part of definition above, does the calculation
+         def calc_loan_term_months(row):            
+            if str(row[value_column]) == "<NA>":
+                try:
+                    row[value_column] = round(-(math.log(1 - ((row[loan_amount] * ((row[int_rate]) / 12)) / row[instalment]))) / (math.log(1 + ((row[int_rate]) / 12))))
+                except Exception as e:
+                    print(row["id"])
+                    print(e)
+                    print(row[loan_amount])
+                    print(row[int_rate])
+                    print(row[instalment])
+                    return row
+                else:
+                    return row
+         self.df = self.df.apply(calc_loan_term_months, axis=1)
+         return self.df
      
      def apply_box_cox(self, column_name):
          """Transforms the data using the box-cox method"""                               
