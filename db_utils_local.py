@@ -176,7 +176,6 @@ class DataFrameTransform:
          self.df[int_rate] = pd.to_numeric(self.df[int_rate]) / 100  # Convert annual interest rate to decimal
          self.df[instalment] = pd.to_numeric(self.df[instalment])
          import numpy as np
-            # Part of definition above, does the calculation
          def calc_loan_term_months(row):            
             if str(row[value_column]) == "<NA>":
                 try:
@@ -187,9 +186,9 @@ class DataFrameTransform:
                     print(row[loan_amount])
                     print(row[int_rate])
                     print(row[instalment])
-                    return row
-                else:
-                    return row
+                return row
+            else:
+                return row
          self.df = self.df.apply(calc_loan_term_months, axis=1)
          return self.df
      
